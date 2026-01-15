@@ -8,14 +8,20 @@ import json
 from datetime import datetime
 from twilio.rest import Client
 import streamlit as st
+from dotenv import load_dotenv
 
-# Twilio Configuration
-TWILIO_ACCOUNT_SID = "AC462224da3e6f655251f6bf2cd7631a65"
-TWILIO_AUTH_TOKEN = "b364e1a75fc34c1eb275b62c8754c68a"
-TWILIO_PHONE_NUMBER = "+16282448340"
+# Load environment variables from .env file
+load_dotenv()
+
+# Twilio Configuration - Load from environment variables
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
 class TwilioNotificationSystem:
     def __init__(self):
+        if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]):
+            raise ValueError("Twilio credentials not found in environment variables. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER.")
         self.client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         self.notification_history_file = "notification_history.json"
         
@@ -101,7 +107,7 @@ Reply STOP to opt out"""
             message = self.client.messages.create(
                 body=message_body,
                 from_=TWILIO_PHONE_NUMBER,
-                to="+601127267920"
+                to=to_phone
             )
             
             # Save to history
